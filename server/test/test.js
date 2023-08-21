@@ -9,7 +9,7 @@ const app = require('../app');
 
 //import User model
 const User = require('../models/user')
-
+let token = ''
 chai.use(http);
 
 describe('App basic tests', () => {
@@ -113,7 +113,7 @@ describe('Protected route', () => {
 			.send(valid_input)
 				.then((login_response) => {
 					//add token to next request Authorization headers as Bearer adw3R£$4wF43F3waf4G34fwf3wc232!w1C"3F3VR
-					const token = 'Bearer ' + login_response.body.token;
+					token = 'Bearer ' + login_response.body.token;
 					chai.request(app).get(`${version}/protected`)
 						.set('Authorization', token)
 						.then(protected_response => {
@@ -133,45 +133,34 @@ describe('Protected route', () => {
 	})
 
 });
-describe('As a User', () => {
-	it('should return 200 and user details if valid token provided', (done) => {
-        //Given a user
-		const valid_user = {
-			"email": "diegoarturosilva@hotmail.com",
-			"password": "secret"
-		}
-		//When send login request to the app to receive token
-		chai.request(app).post(`${version}/login`)
-            .send(valid_user)
-                //Then user get a token
-				.then((login_response) => {
-                    const token = 'Bearer ' + login_response.body.token;
+describe('User can view books in library', () => {
+    describe('I want to see the books present in the library',()=>{
+        it('So that I can choose which book to borrow',(done)=>{
+            chai.request(app).get(`${version}/books`)
+                .set('Authorization', token)
+                .then(books => {
+                    //assertions
+                    expect(books).to.have.status(200);
+                    expect(books.body.message).to.be.equal('There are no books in the library');
+                    expect(books.body.books.length).to.be.equal(0);
+                    expect(books.body.errors.length).to.be.equal(0);
+                    done();
+                }).catch(err => {
+                    console.log(err.message);
+                });
+        })
+        after(() => {
+		    //stop app server
+		    console.log('All tests completed, stopping server....')
+		    process.exit();
+        });
 
-                    describe('I want to see the books present in the library',()=>{
-                        describe('So that I can choose which book to borrow',()=>{
-                            chai.request(app).get(`${version}/books`)
-                            .set('Authorization', token)
-                            .then(protected_response => {
-                                //assertions
-							    expect(protected_response).to.have.status(200);
-                                expect(protected_response.body.items.length).to.be.equal(0);
-							    expect(protected_response.body.errors.length).to.be.equal(0);
-							    done();
-                            }).catch(err => {
-                                console.log(err.message);
-                            });
-                        });
-                    })
-				}).catch(err => {
-					console.log(err.message);
-				});
-	})
-
-	after((done) => {
+    })
+})
+    //})
+    /*after((done) => {
 		//stop app server
 		console.log('All tests completed, stopping server....')
 		process.exit();
 		done();
-	});
-
-});
+	});*/

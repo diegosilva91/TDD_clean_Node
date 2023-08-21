@@ -3,6 +3,7 @@ const { MongoClient } = require('mongodb');
 const bodyParser = require('body-parser')
 const app = express()
 const userRoutes = require('./routers/userRoutes')
+const bookRoutes = require('./routers/bookRoutes')
 const version = '/v1'
 require("dotenv").config();
 const config = require('./config/local');
@@ -23,5 +24,5 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.use(version, userRoutes)
-
+app.use(version, bookRoutes)
 module.exports = app

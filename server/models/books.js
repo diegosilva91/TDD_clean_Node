@@ -8,4 +8,4 @@ const booksSchema = mongoose.Schema({
 	timestamps: true
 });
 
-module.exports = mongoose.model('Book', userSchema, 'books');
+module.exports = mongoose.model('Book', booksSchema, 'books');
